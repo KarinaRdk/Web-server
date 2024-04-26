@@ -48,9 +48,6 @@ HTTP Endpoints:
 
 /: Serves the HTML page for displaying order data.
 
-## Subscriber:
-Listens for messages on the NATS Streaming Server and updates the database and cache with new orders.
-
 ## To publish a message
 
 git clone https://github.com/KarinaRdk/Web-server.git
