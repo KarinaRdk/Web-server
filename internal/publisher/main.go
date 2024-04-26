@@ -28,7 +28,7 @@ func main() {
 	}
 	defer sc.Close()
 
-	msg, err := os.ReadFile("../../broker/messages/model.json")
+	msg, err := os.ReadFile("./internal/publisher/model.json")
 	if err != nil {
 		log.Println("Cannot read file:", err)
 	}
