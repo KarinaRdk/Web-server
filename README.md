@@ -25,7 +25,7 @@ NATS Streaming Server
 ## Installation
 Clone the repository:
 
-git clone https://github.com/yourusername/DemonstrationService.git
+git clone https://github.com/KarinaRdk/Web-server.git
 cd DemonstrationService
 Install dependencies:
 
@@ -46,6 +46,8 @@ HTTP Endpoints:
 Listens for messages on the NATS Streaming Server and updates the database and cache with new orders.
 
 ## To publish a message
+go mod download github.com/nats-io/nats.go
+go mod download github.com/nats-io/stan.go
 go run internal/publisher/main.go
 
 if you wish to edit the message you can do it by editing internal/publisher/model.json
