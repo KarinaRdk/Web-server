@@ -46,10 +46,15 @@ HTTP Endpoints:
 Listens for messages on the NATS Streaming Server and updates the database and cache with new orders.
 
 ## To publish a message
+
 git clone https://github.com/KarinaRdk/Web-server.git
+
 go mod download github.com/nats-io/nats.go
+
 go mod download github.com/nats-io/stan.go
+
 go get github.com/nats-io/stan.go/pb@v0.10.4
+
 go get github.com/nats-io/nats.go@v1.34.1
 
 go run internal/publisher/main.go
