@@ -1,6 +1,7 @@
 package subscriber
 
 import (
+	"TestWebServer/internal/cache"
 	"TestWebServer/internal/config"
 	"TestWebServer/internal/model"
 	"TestWebServer/internal/storage"
@@ -18,11 +19,11 @@ import (
 
 type Subscriber struct {
 	pg *storage.Database
-	// cache *redis, *cache
+	c  *cache.InMemory
 }
 
-func NewSubscriber(s *storage.Database) *Subscriber {
-	return &Subscriber{pg: s}
+func New(s *storage.Database, cache *cache.InMemory) *Subscriber {
+	return &Subscriber{pg: s, c: cache}
 }
 
 func (s *Subscriber) Receive() {
@@ -78,6 +79,8 @@ func (s *Subscriber) Receive() {
 	<-cleanupDone
 }
 
+// work unmarshals received message, checks if it's a json with the fields we're expecting and if so
+// - stores it i database and in cache
 func (s *Subscriber) work(msg *stan.Msg) {
 	order := model.Order{}
 	log.Printf("Received: %s\n", string(msg.Data))
@@ -86,13 +89,22 @@ func (s *Subscriber) work(msg *stan.Msg) {
 		log.Println("Error of Unmarshalling a message ", err.Error())
 		return
 	}
-	fmt.Printf("%#v\n", order)
 	if !validation.Check(order) {
 		log.Println("Validation failed")
 		return
 	}
 
-	s.pg.InsertOrder(order)
+	if !s.pg.IfStored(*order.OrderUid) {
+		s.putInStorage(&order)
+		s.c.Set(*order.OrderUid, msg.Data)
+	}
+
+}
+
+// putInStorage calls on functions to add a new order to db
+func (s *Subscriber) putInStorage(order *model.Order) {
+	log.Println("putInStorage")
+	s.pg.InsertOrder(*order)
 	s.pg.InsertDelivery(*order.OrderUid, order.Delivery)
 	s.pg.InsertPayment(*order.OrderUid, order.Payment)
 	s.pg.InsertItems(*order.OrderUid, order.Items)
