@@ -26,7 +26,9 @@ NATS Streaming Server
 Clone the repository:
 
 git clone https://github.com/KarinaRdk/Web-server.git
-cd DemonstrationService
+
+cd WEB-SERVICE
+
 Install dependencies:
 
 go mod download
@@ -37,9 +39,13 @@ Configure your application by editing the config/local.yaml file. Ensure the dat
 
 Build and run the application
 
+go run cmd/main.go
+
 ## Usage
 HTTP Endpoints:
+
 /get_order: Retrieves an order by its ID.
+
 /: Serves the HTML page for displaying order data.
 
 ## Subscriber:
