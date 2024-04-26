@@ -24,7 +24,7 @@ type HTTPServer struct {
 }
 
 func MustLoad() *Config { //  start with mast because it doesn't return an error and just panics
-	configPath := "../config/local.yaml"
+	configPath := "./config/local.yaml"
 	if configPath == "" {
 		log.Fatal("no CONFIG_PATH")
 	}
