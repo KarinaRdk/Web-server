@@ -1,36 +1,60 @@
 package main
 
 import (
+	"TestWebServer/internal/cache"
 	"TestWebServer/internal/config"
+	"TestWebServer/internal/handler"
+	"TestWebServer/internal/logger"
+	"TestWebServer/internal/service"
 	"TestWebServer/internal/storage"
 	"TestWebServer/internal/subscriber"
-	"fmt"
-	_ "github.com/lib/pq"
+	"TestWebServer/server"
 	"log"
-	"log/slog"
+
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
 	cfg := config.MustLoad()
-	fmt.Println(cfg)
 
+	// Ensure functioning of logger.
+	l := logger.SetupLogger("development")
+	l.Info("Database initialized successfully")
+
+	// Initializing database
 	pg, err := storage.InitDatabase(*cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer pg.Close()
-
-	logger := setupLogger("development")
-	logger.Info("Database initialized successfully")
 	db := storage.NewDatabase(pg)
-	sub := subscriber.NewSubscriber(db)
-	sub.Receive()
 
-}
+	// Initializing cache.
+	c := cache.New()
 
-func setupLogger(env string) *slog.Logger {
-	var log *slog.Logger
-	log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	return log
+	// Creating a subscriber to receive messages via a broker.
+	sub := subscriber.New(db, c)
+	go sub.Receive()
+
+	s := service.New(db, c)
+	h := handler.New(s)
+
+	// Create a ServeMux and register routes.
+	mux := http.NewServeMux()
+	handler.RegisterRoutes(h, mux)
+
+	// Create and start the server with the ServeMux.
+	serv := server.New(cfg.HTTPServer.Address, mux)
+	serv.Start()
+
+	// Wait for an interrupt signal.
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	// Gracefully shut down the server.
+	serv.Stop()
 }
