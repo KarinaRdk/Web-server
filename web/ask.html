@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<form id="form_e">
+    <div class="container d-flex align-items-center justify-content-center vh-100">
+        <div class="row">
+
+            <div class="col-md-6">
+
+            <div class="mb-3">
+                <input type="text" class="form-control mb-2" placeholder="id" id="idInput">
+            </div>
+                <button type="submit" data-bs-toggle="collapse" href="#C" class="btn btn-primary btn-lg btn-block" aria-controls="C">Get order information</button>
+            </div>
+
+            <div class="mb-3">
+<!--                <textarea id="Order" rows="26" cols="50"></textarea>-->
+
+                <div class="collapse" id="C">
+                    <div class="card card-body textarea-container">
+                        <textarea id="Order" class="form-control" rows="10" cols="50"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<script>
+    document.getElementById('form_e').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var id = document.getElementById('idInput').value; // Get the value of the input field
+        var orderTextarea = document.getElementById('Order'); // Reference to the textarea
+
+        // Clear the textarea before fetching new data
+        orderTextarea.value = '';
+
+        fetch('/get_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: id }),
+        })
+            .then(response => {
+                // Check if the response is OK
+                if (!response.ok) {
+                    // If not OK, throw an error with the status and statusText
+                    throw new Error(`${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response:', data); // Log the response data
+                // Convert the JSON object to a formatted string with indentation
+                const jsonString = JSON.stringify(data, null, 2); // The second argument is null (no replacer function), and the third argument is 2 (two spaces for indentation)
+                // Append the formatted JSON string to the textarea
+                orderTextarea.value = jsonString;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Display the error message in the textarea
+                orderTextarea.value = `Error: ${error.message}`;
+            });
+
+        // Check if the textarea is in focus before toggling the collapse
+        if (!orderTextarea.matches(':focus')) {
+            var collapseElement = document.getElementById('C');
+            var bsCollapse = new bootstrap.Collapse(collapseElement, {
+                toggle: true
+            });
+        }
+    });
+
+</script>
+
+</body>
+</html>
+
+
