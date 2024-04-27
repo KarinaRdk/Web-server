@@ -25,21 +25,19 @@ NATS Streaming Server
 ## Installation
 Clone the repository:
 
-git clone https://github.com/KarinaRdk/Web-server.git
+    git clone https://github.com/KarinaRdk/Web-server.git
 
-cd WEB-SERVICE
+    cd WEB-SERVICE
 
 Install dependencies:
 
-go mod download
+     go mod download
 
 Set up your PostgreSQL database and NATS Streaming Server.
 
-Configure your application by editing the config/local.yaml file. Ensure the database connection string and NATS Streaming Server details are correctly set.
-
 Build and run the application
 
-go run cmd/main.go
+    go run cmd/main.go
 
 ## Usage
 HTTP Endpoints:
@@ -50,16 +48,7 @@ HTTP Endpoints:
 
 ## To publish a message
 
-git clone https://github.com/KarinaRdk/Web-server.git
+    go run internal/publisher/main.go
+    
 
-go mod download github.com/nats-io/nats.go
-
-go mod download github.com/nats-io/stan.go
-
-go get github.com/nats-io/stan.go/pb@v0.10.4
-
-go get github.com/nats-io/nats.go@v1.34.1
-
-go run internal/publisher/main.go
-
-if you wish to edit the message you can do it by editing internal/publisher/model.json
+if you wish to change the message you can do it by editing internal/publisher/model.json
