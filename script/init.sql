@@ -1,6 +1,5 @@
 
 CREATE TABLE IF NOT EXISTS orders (
---    id SERIAL PRIMARY KEY,
    order_uid TEXT NOT NULL PRIMARY KEY,
    track_number TEXT NOT NULL,
    entry TEXT NOT NULL,
