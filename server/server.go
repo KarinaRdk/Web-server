@@ -28,7 +28,6 @@ func (s *Server) Start() {
 		if err := s.httpServer.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}
-		log.Println("Server Started")
 	}()
 }
 
